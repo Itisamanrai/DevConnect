@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "target": "ES6",        // Convert TS → JS using ES6 standard
+    "module": "commonjs",   // Use require/module.exports (Node.js style)
+    "rootDir": "./src",     // My TS source files are here
+    "outDir": "./dist",     // Put compiled JS files here
+    "strict": true,         // Enable strict type checking (catches bugs)
+    "esModuleInterop": true,// Allow clean imports like: import express from 'express'
+    "skipLibCheck": true    // Skip checking node_modules types (faster)
+  }
+}
