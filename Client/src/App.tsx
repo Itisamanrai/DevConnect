@@ -41,8 +41,7 @@ type CodeExplanation = {
   keyPoints: string[];
 };
 
-const API_BASE = "http://localhost:5001";
-
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5001";
 function App() {
   const [activeTab, setActiveTab] = useState<"feed" | "profile">("feed");
   const [posts, setPosts] = useState<Post[]>([]);
@@ -52,12 +51,19 @@ function App() {
   const [likingPostId, setLikingPostId] = useState("");
   const [selectedCode, setSelectedCode] = useState("");
   const [explainLoading, setExplainLoading] = useState(false);
-  const [codeExplanation, setCodeExplanation] = useState<CodeExplanation | null>(null);
+  const [codeExplanation, setCodeExplanation] =
+    useState<CodeExplanation | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const totalLikes = posts.reduce((sum, post) => sum + (post.likes?.length || 0), 0);
-  const totalComments = posts.reduce((sum, post) => sum + (post.comments?.length || 0), 0);
+  const totalLikes = posts.reduce(
+    (sum, post) => sum + (post.likes?.length || 0),
+    0,
+  );
+  const totalComments = posts.reduce(
+    (sum, post) => sum + (post.comments?.length || 0),
+    0,
+  );
 
   useEffect(() => {
     const fetchData = async () => {
@@ -214,7 +220,9 @@ function App() {
         <div className="hero-text">
           <p className="eyebrow">COMMUNITY CODING SPACE</p>
           <h1>DevConnect</h1>
-          <p>Share code, discuss ideas, and level up your full stack workflow.</p>
+          <p>
+            Share code, discuss ideas, and level up your full stack workflow.
+          </p>
         </div>
         {/* Stats cards are purely presentational and styled through .stat-card classes. */}
         <div className="hero-stats" aria-label="Platform metrics">
@@ -266,14 +274,17 @@ function App() {
             ) : (
               posts.map((post) => {
                 const likeCount = post.likes?.length || 0;
-                const isLiked = !!currentUserId && (post.likes || []).includes(currentUserId);
+                const isLiked =
+                  !!currentUserId && (post.likes || []).includes(currentUserId);
 
                 return (
                   // Post card design: bordered surface + subtle depth + badges for readability.
                   <article key={post._id} className="post-card">
                     <div className="post-head">
                       <h3>{post.title}</h3>
-                      <span className="time-pill">{new Date(post.createdAt).toLocaleDateString()}</span>
+                      <span className="time-pill">
+                        {new Date(post.createdAt).toLocaleDateString()}
+                      </span>
                     </div>
                     <p>{post.content}</p>
 
@@ -329,7 +340,8 @@ function App() {
                     </div>
 
                     <small>
-                      By {post.author?.name || "Unknown"} ({post.author?.email || "No email"}) •{" "}
+                      By {post.author?.name || "Unknown"} (
+                      {post.author?.email || "No email"}) •{" "}
                       {new Date(post.createdAt).toLocaleString()}
                     </small>
                   </article>
@@ -353,7 +365,11 @@ function App() {
               placeholder="Paste code here..."
             />
 
-            <button onClick={handleExplainCode} disabled={explainLoading} className="primary-btn">
+            <button
+              onClick={handleExplainCode}
+              disabled={explainLoading}
+              className="primary-btn"
+            >
               {explainLoading ? "Generating..." : "Explain Code"}
             </button>
 
@@ -404,7 +420,8 @@ function App() {
                 <h4>{post.title}</h4>
                 <p>{post.content}</p>
                 <small>
-                  Likes: {post.likes?.length || 0} • Comments: {post.comments?.length || 0}
+                  Likes: {post.likes?.length || 0} • Comments:{" "}
+                  {post.comments?.length || 0}
                 </small>
               </div>
             ))
