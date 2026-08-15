@@ -1,0 +1,21 @@
+# Node / package manager
+node_modules/
+Client/node_modules/
+Server/node_modules/
+
+# Build output
+Client/dist/
+Server/dist/
+
+# Environment files
+.env
+Server/.env
+Client/.env
+
+# OS files
+.DS_Store
+**/.DS_Store
+
+# Logs
+*.log
+npm-debug.log*

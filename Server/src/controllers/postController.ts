@@ -5,12 +5,13 @@ import User from "../models/User";
 import { AuthRequest } from "../middleware/authMiddleware";
 
 // GET ALL POSTS (FEED)
+// Feed API fetches every post from the database along with author and comment details, sorted from newest to oldest.
 export const getAllPosts = async (
   req: AuthRequest,
   res: Response,
 ): Promise<void> => {
   try {
-    const posts = await Post.find()
+    const posts = await Post.find() // find(), it returns all the documents matching the query
       .populate("author", "name email")
       .populate({
         path: "comments",
@@ -87,6 +88,7 @@ export const createPost = async (
     }
 
     // CREATE NEW POST
+    // This API creates a new post and links that post to the logged-in user.
     const newPost = new Post({
       title,
       content,
@@ -96,7 +98,7 @@ export const createPost = async (
       comments: [],
     });
 
-    // SAVE POST IN DB
+    // SAVE POST IN DB, with everything which we define in PostSchema
     const savedPost = await newPost.save();
 
     // LINK POST TO USER
@@ -114,6 +116,7 @@ export const createPost = async (
 };
 
 // GET SINGLE POST
+// This API returns one specific post along with its author and all comment details.
 export const getPost = async (
   req: AuthRequest,
   res: Response,
@@ -173,6 +176,7 @@ export const deletePost = async (
 };
 
 // LIKE / UNLIKE POST
+// This API checks whether the current user has already liked the post. If yes, it removes the like; otherwise, it adds the like.
 export const toggleLikePost = async (
   req: AuthRequest,
   res: Response,
@@ -198,6 +202,7 @@ export const toggleLikePost = async (
       ? await Post.findByIdAndUpdate(postId, { $pull: { likes: userId } }, { new: true })
       : await Post.findByIdAndUpdate(postId, { $addToSet: { likes: userId } }, { new: true });
 
+      // we are checking that Post exists or not bcz , btwn FIND POST and UPDATE , may be this post could be deleted.
     if (!updatedPost) {
       res.status(404).json({ message: "Post not found" });
       return;

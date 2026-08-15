@@ -43,8 +43,8 @@ const userSchema = new Schema(
   },
 );
 
-userSchema.pre("save", async function save() {
-  if (!this.isModified("password")) {
+userSchema.pre("save", async function save() { // this is A pre hook runs automatically before a document is saved.
+  if (!this.isModified("password")) { // Only if the password changes does hashing happen.
     return;
   }
 

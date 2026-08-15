@@ -4,6 +4,8 @@ import User from "../models/User";
 import Post from "../models/Post";
 import { AuthRequest } from "../middleware/authMiddleware";
 
+const jwtSecret = process.env.JWT_SECRET || "devconnect-super-secret-key";
+
 // FOR SIGNUP
 export const signup = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -15,8 +17,6 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
             res.status(400).json({ message: "User already exists"});
             return;
         }
-
-        // HASH password
 
         // CREATE NEW USER
         const newUser = new User({
@@ -30,7 +30,7 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
         // GENERATE Jwt
         const token = jwt.sign(
             { id: newUser._id },
-            process.env.JWT_SECRET as string,
+            jwtSecret,
             { expiresIn: '7d' }
         );
 
@@ -44,6 +44,7 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
             },
         });
     } catch (error) {
+        console.error("Signup error:", error);
         res.status(500).json({ message: "Server error", error });
     }
 };
@@ -70,7 +71,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         // GENERATE JWT
         const token = jwt.sign(
             { id: user._id },
-            process.env.JWT_SECRET as string,
+            jwtSecret,
             { expiresIn: "7d" }
         );
 
@@ -79,11 +80,12 @@ export const login = async (req: Request, res: Response): Promise<void> => {
             token,
             user: {
                 id: user._id,
-                username: user.name,
+                name: user.name,
                 email: user.email,
             },
         });
     } catch (error){
+        console.error("Login error:", error);
         res.status(500).json({ message: "Server error", error});
     }
 };
@@ -105,7 +107,7 @@ export const getProfile = async (req: AuthRequest, res: Response): Promise<void>
         }
 
         const posts = await Post.find({ author: userId })
-            .sort({ createdAt: -1 })
+            .sort({ createdAt: -1 }) // sort by DESC or NEWEST first 
             .populate("author", "name email")
             .populate({
                 path: "comments",

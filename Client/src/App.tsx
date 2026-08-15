@@ -41,7 +41,10 @@ type CodeExplanation = {
   keyPoints: string[];
 };
 
-const API_BASE = (import.meta.env.VITE_API_URL || "https://dev-connect-api-ten.vercel.app").replace(/\/$/, "");
+const API_BASE = (
+  import.meta.env.VITE_API_URL ||
+  (import.meta.env.DEV ? "http://localhost:5001" : "https://dev-connect-api-ten.vercel.app")
+).replace(/\/$/, "");
 
 function App() {
   const [authMode, setAuthMode] = useState<"login" | "signup">("login");

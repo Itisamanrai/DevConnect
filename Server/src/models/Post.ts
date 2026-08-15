@@ -1,13 +1,13 @@
 import mongoose, { Document, Schema} from "mongoose";
 
-// interface - defines shape of post
-export interface IPost extends Document {
+export interface IPost extends Document { // it tells TS that Every Post object should look like this.
+
     title: string;
     content: string;
     code?: string,                   // optinal code snippet
-    author: mongoose.Types.ObjectId;   // ref to User
+    author: mongoose.Types.ObjectId;   // it stores User_ID, who created this post 
     likes: mongoose.Types.ObjectId[];  // array of User ids 
-    comments: mongoose.Types.ObjectId[];  // array of comment ids 
+    comments: mongoose.Types.ObjectId[];  // array of comment ids , not whole comments 
     createdAt: Date;
     updatedAt: Date;
 }
@@ -25,7 +25,7 @@ const PostSchema: Schema = new Schema(
         },
         code: {
             type: String,
-            default: '',
+            default: '', //  use to handle by frontend that's why we use ' ' instead of NULL
         },
         author: {
             type: mongoose.Schema.Types.ObjectId,
@@ -48,4 +48,4 @@ const PostSchema: Schema = new Schema(
     { timestamps: true }
 );
 
-export default mongoose.model<IPost>('Post', PostSchema);
+export default mongoose.model<IPost>('Post', PostSchema); // this creates the posts collectiob inside a MONGODB

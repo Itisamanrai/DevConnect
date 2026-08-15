@@ -1,6 +1,8 @@
 import { Response } from "express";
 import { AuthRequest } from "../middleware/authMiddleware";
 
+//This controller analyzes a code snippet using predefined rules and returns a summary, complexity level, and key observations.
+
 type ExplainResult = {
   summary: string;
   complexity: "Basic" | "Intermediate";

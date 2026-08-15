@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
+const jwtSecret = process.env.JWT_SECRET || "devconnect-super-secret-key";
 
 // EXTEND REQ TO INCLUDE USER
 export interface AuthRequest extends Request {
@@ -22,10 +23,10 @@ const authMiddleware = (
     try{
         const decoded = jwt.verify(
             token,
-            process.env.JWT_SECRET as string
+            jwtSecret
         ) as  { id: string};
 
-        req.user = { id: decoded.id };
+        req.user = { id: decoded.id }; // After successful verification, it stores the decoded user ID in req.user.
         next();
     } catch (error) {
         res.status(401).json({ message: " Invalid token "});
