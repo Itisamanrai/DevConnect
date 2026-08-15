@@ -16,11 +16,33 @@ const app = express(); // control center of backend
 const allowedOrigins = [
   "https://dev-connect-ui.vercel.app",
   "http://localhost:5173",
+  "http://localhost:5174",
+  "http://localhost:5175",
+  "http://127.0.0.1:5173",
+  "http://127.0.0.1:5174",
+  "http://127.0.0.1:5175",
 ];
 
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: (origin, callback) => {
+      if (!origin) {
+        callback(null, true);
+        return;
+      }
+
+      const isAllowed = allowedOrigins.includes(origin) ||
+        /^http:\/\/localhost:\d+$/.test(origin) ||
+        /^http:\/\/127\.0\.0\.1:\d+$/.test(origin) ||
+        /\.vercel\.app$/.test(origin);
+
+      if (isAllowed) {
+        callback(null, true);
+      } else {
+        callback(new Error(`Origin ${origin} not allowed by CORS`));
+      }
+    },
+    credentials: true,
   }),
 );
 app.use(express.json()); // Converts incoming JSON into req.body
@@ -45,22 +67,21 @@ async function startDb() {
     console.log("Connected to in-memory MongoDB fallback");
   };
 
-  try {
-    if (mongoUri) {
+  if (mongoUri && mongoUri.trim()) {
+    try {
       await mongoose.connect(mongoUri);
       console.log("MongoDB connected");
       return;
+    } catch (err) {
+      console.log("Primary MongoDB connection failed. Falling back to in-memory MongoDB.", err);
     }
+  }
 
+  try {
     await connectWithMemoryFallback();
-  } catch (err) {
-    console.log("DB Error:", err);
-    try {
-      await connectWithMemoryFallback();
-      console.log("Recovered by falling back to in-memory MongoDB");
-    } catch (memoryErr) {
-      console.log("Failed to start in-memory MongoDB:", memoryErr);
-    }
+    console.log("Recovered by falling back to in-memory MongoDB");
+  } catch (memoryErr) {
+    console.log("Failed to start in-memory MongoDB:", memoryErr);
   }
 }
 
